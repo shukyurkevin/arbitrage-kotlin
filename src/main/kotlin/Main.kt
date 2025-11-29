@@ -12,14 +12,19 @@ fun main() {
     val exB = ExchangeBook("B")
     val detector = ArbitrageDetector(exA, exB)
 
-    exA.addOrder(Order("1", OrderType.BUY,20.0,1.0))
-    exA.addOrder(Order("2", OrderType.SELL,15.0,1.0))
+    exA.addOrder(Order("1", OrderType.SELL,13.0,1.0))
+    exA.addOrder(Order("2", OrderType.BUY,29.0,1.0))
 
-    exB.addOrder(Order("3", OrderType.BUY,25.0,1.0))
+    exB.addOrder(Order("3", OrderType.BUY,24.0,1.0))
     exB.addOrder(Order("4", OrderType.SELL,12.0,1.0))
 
-    while (true) {
-        println(detector.findOpportunity())
-        Thread.sleep(1000)
-    }
+    println(exA.bestBid())
+    println(exB.bestBid())
+    println(exA.bestAsk())
+    println(exB.bestAsk())
+
+    val deals = detector.findAll()
+
+    println(deals)
+
 }

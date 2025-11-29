@@ -9,10 +9,10 @@ class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchang
         val aBestAsk = exchangeA.bestAsk()
         val bBestBid = exchangeB.bestBid()
         val bBestAsk = exchangeB.bestAsk()
+        println("DEBUG findOpportunity -> A: bid=$aBestBid ask=$aBestAsk  B: bid=$bBestBid ask=$bBestAsk")
 
-        if (aBestBid == null || aBestAsk == null || bBestBid == null || bBestAsk == null) return null
 
-        if (aBestBid > bBestAsk) {
+        if (aBestBid != null && bBestAsk != null && aBestBid > bBestAsk) {
             return Arbitrage(
                 buyExchange = exchangeB.name,
                 sellExchange = exchangeA.name,
@@ -22,7 +22,7 @@ class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchang
             )
         }
 
-        if (bBestBid > aBestAsk) {
+        if (bBestBid != null && aBestAsk != null && bBestBid > aBestAsk){
             return Arbitrage(
                 buyExchange = exchangeA.name,
                 sellExchange = exchangeB.name,
@@ -32,5 +32,22 @@ class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchang
             )
         }
         return null
+    }
+    fun findAll() : List<Arbitrage> {
+        val results = mutableListOf<Arbitrage>()
+
+        while(true){
+            val arb = findOpportunity()?: break
+            results.add(arb)
+
+            if (arb.buyExchange == exchangeA.name){
+                exchangeA.removeBestSell()
+                exchangeB.removeBestBid()
+            }else{
+                exchangeB.removeBestSell()
+                exchangeA.removeBestBid()
+            }
+        }
+        return results
     }
 }

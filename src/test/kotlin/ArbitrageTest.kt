@@ -22,6 +22,7 @@ class ArbitrageTest {
 
     @Test
     fun testArbitrageDetection(){
+
         exA.addOrder(Order("1", OrderType.SELL, 13.0, 1.0))
         exA.addOrder(Order("2", OrderType.BUY, 29.0, 1.0))
 

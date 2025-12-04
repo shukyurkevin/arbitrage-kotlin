@@ -1,18 +1,16 @@
-package org.kevin.services
+package org.kevin.utils
 
 import org.kevin.data.Order
 import org.kevin.enums.OrderType
 import kotlin.random.Random
-import java.util.UUID
 
 class OrderGenerator {
 
     fun randomOrder(): Order {
-        val id = UUID.randomUUID().toString()
+        val id = Random.nextInt(1, 101).toString()
         val type = if (Random.nextBoolean()) OrderType.BUY else OrderType.SELL
-        val price = Random.nextDouble(10.0, 100.0)   // диапазон цены 10–100
+        val price = Random.nextInt(10, 100).toDouble()
         val quantity = 1.0
-
         return Order(id, type, price, quantity)
     }
 

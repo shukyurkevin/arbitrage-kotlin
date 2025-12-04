@@ -1,7 +1,6 @@
 package org.kevin.services
 
 import org.kevin.data.Arbitrage
-import kotlin.math.ulp
 
 class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchangeB: ExchangeBook) {
 
@@ -10,8 +9,6 @@ class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchang
         val aBestAsk = exchangeA.bestAsk()
         val bBestBid = exchangeB.bestBid()
         val bBestAsk = exchangeB.bestAsk()
-        println("DEBUG findOpportunity -> A: bid=$aBestBid ask=$aBestAsk  B: bid=$bBestBid ask=$bBestAsk")
-
 
         if (aBestBid != null && bBestAsk != null && aBestBid > bBestAsk) {
             if ((aBestBid - bBestAsk > bBestAsk / 10)) {

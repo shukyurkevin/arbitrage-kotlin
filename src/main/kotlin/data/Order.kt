@@ -1,4 +1,4 @@
-package org.kevin.models
+package org.kevin.data
 
 import org.kevin.enums.OrderType
 

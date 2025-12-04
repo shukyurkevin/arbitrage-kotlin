@@ -3,6 +3,7 @@ package org.kevin.services
 import org.kevin.enums.OrderType
 import org.kevin.models.Order
 import java.util.TreeMap
+import kotlin.math.min
 
 class ExchangeBook(val name: String) {
     private val buyOrders : TreeMap<Double, MutableList<Order>> = TreeMap(reverseOrder())
@@ -57,6 +58,30 @@ class ExchangeBook(val name: String) {
         ordersById.remove(removedOrder.id)
         return removedOrder
     }
+    @Synchronized
+    fun costToBuy(quantity: Double): Double? {
+
+        var cost = 0.0;
+        var remainingQuantity = quantity;
+
+        for ((price,orders) in sellOrders){
+            if (orders.isEmpty()) continue
+
+            for (order in orders){
+                val qtyToBuy = min(order.quantity, remainingQuantity)
+                cost += qtyToBuy * price
+                remainingQuantity -= qtyToBuy
+
+                if (remainingQuantity <= 0.0){
+                    println(cost)
+                    return cost
+                }
+            }
+        }
+        println("not enough quantity to buy $quantity")
+        return null
+    }
+
 
     @Synchronized
     fun bestBid(): Double? = buyOrders.firstEntry()?.key

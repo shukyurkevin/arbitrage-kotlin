@@ -69,4 +69,26 @@ class ArbitrageTest {
 
     }
 
+    @Test
+    fun findBestBid(){
+        exA.addOrder(Order("1", OrderType.BUY, 13.0, 1.0))
+        exA.addOrder(Order("2", OrderType.BUY, 24.0, 1.0))
+        exB.addOrder(Order("3", OrderType.BUY, 19.0, 5.0))
+        exB.addOrder(Order("4", OrderType.BUY, 29.0, 1.0))
+
+        val bestBid = detector.findBestBid(listOf(exA, exB))
+        assertEquals(29.0, bestBid)
+    }
+
+    @Test
+    fun findBestAsk(){
+        exA.addOrder(Order("1", OrderType.SELL, 13.0, 1.0))
+        exA.addOrder(Order("2", OrderType.SELL, 24.0, 1.0))
+        exB.addOrder(Order("3", OrderType.SELL, 19.0, 5.0))
+        exB.addOrder(Order("4", OrderType.SELL, 29.0, 1.0))
+
+        val bestAsk = detector.findBestAsk(listOf(exA, exB))
+        assertEquals(13.0, bestAsk)
+    }
+
 }

@@ -1,6 +1,7 @@
 package org.kevin.services
 
 import org.kevin.models.Arbitrage
+import org.kevin.models.Order
 
 class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchangeB: ExchangeBook) {
 
@@ -50,4 +51,31 @@ class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchang
         }
         return results
     }
+    fun findBestBid(exchanges: List<ExchangeBook>): Double? {
+        var bestBid: Double? = null
+        for (exchange in exchanges) {
+            val exchangeBestBid = exchange.bestBid()
+            if (exchangeBestBid != null) {
+                if (bestBid == null || exchangeBestBid > bestBid) {
+                    bestBid = exchangeBestBid
+                }
+            }
+        }
+        return bestBid
+
+    }
+    fun findBestAsk(exchanges: List<ExchangeBook>): Double? {
+        var bestAsk: Double? = null
+        for (exchange in exchanges) {
+            val exchangeBestAsk = exchange.bestAsk()
+            if (exchangeBestAsk != null) {
+                if (bestAsk == null || exchangeBestAsk < bestAsk) {
+                    bestAsk = exchangeBestAsk
+                }
+            }
+        }
+        return bestAsk
+
+    }
+
 }

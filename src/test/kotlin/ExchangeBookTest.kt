@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.kevin.data.Order
 import org.kevin.enums.OrderType
-import org.kevin.services.ArbitrageDetector
 import org.kevin.services.ExchangeBook
 
 class ExchangeBookTest {

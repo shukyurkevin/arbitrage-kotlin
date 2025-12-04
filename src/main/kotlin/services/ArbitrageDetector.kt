@@ -1,6 +1,7 @@
 package org.kevin.services
 
 import org.kevin.data.Arbitrage
+import kotlin.math.ulp
 
 class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchangeB: ExchangeBook) {
 
@@ -13,17 +14,19 @@ class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchang
 
 
         if (aBestBid != null && bBestAsk != null && aBestBid > bBestAsk) {
-            return Arbitrage(
-                buyExchange = exchangeB.name,
-                sellExchange = exchangeA.name,
-                buyPrice = bBestAsk,
-                sellPrice = aBestBid,
-                profitPerUnit = aBestBid - bBestAsk,
-                profitQty = 1.0
-            )
+            if ((aBestBid - bBestAsk > bBestAsk / 10)) {
+                return Arbitrage(
+                    buyExchange = exchangeB.name,
+                    sellExchange = exchangeA.name,
+                    buyPrice = bBestAsk,
+                    sellPrice = aBestBid,
+                    profitPerUnit = aBestBid - bBestAsk,
+                    profitQty = 1.0
+                )
+            }else null
         }
-
         if (bBestBid != null && aBestAsk != null && bBestBid > aBestAsk){
+            if (bBestBid - aBestAsk > bBestBid / 10){
             return Arbitrage(
                 buyExchange = exchangeA.name,
                 sellExchange = exchangeB.name,
@@ -32,6 +35,7 @@ class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchang
                 profitPerUnit = bBestBid - aBestAsk,
                 profitQty = 1.0
             )
+        }else null
         }
         return null
     }
@@ -50,6 +54,8 @@ class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchang
                 exchangeA.removeBestBid()
             }
         }
+//        val validResults = results.filter {it.profitQty > 0}
+//        val listsOfResults = results.partition {it.profitQty > 0}
         return results
     }
     fun findBestBid(exchanges: List<ExchangeBook>): Double? {

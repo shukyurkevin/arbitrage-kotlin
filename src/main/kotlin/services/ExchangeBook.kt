@@ -129,4 +129,17 @@ class ExchangeBook(val name: String) {
         if (bestOrder.isEmpty()) return null
         return bestOrder.first()
     }
+
+    @Override
+    override fun toString(): String {
+        var str = "Name " + name + " BuyOrders "
+        buyOrders.forEach {
+            str += it.value
+            str += "\n" }
+
+        sellOrders.forEach {
+            str += it.value
+            str += "\n" }
+        return str
+    }
 }

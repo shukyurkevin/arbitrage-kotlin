@@ -1,6 +1,7 @@
 package org.kevin.services
 
-import org.kevin.models.Arbitrage
+import org.kevin.data.Arbitrage
+import kotlin.math.ulp
 
 class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchangeB: ExchangeBook) {
 
@@ -13,23 +14,28 @@ class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchang
 
 
         if (aBestBid != null && bBestAsk != null && aBestBid > bBestAsk) {
-            return Arbitrage(
-                buyExchange = exchangeB.name,
-                sellExchange = exchangeA.name,
-                buyPrice = bBestAsk,
-                sellPrice = aBestBid,
-                profitPerUnit = aBestBid - bBestAsk
-            )
+            if ((aBestBid - bBestAsk > bBestAsk / 10)) {
+                return Arbitrage(
+                    buyExchange = exchangeB.name,
+                    sellExchange = exchangeA.name,
+                    buyPrice = bBestAsk,
+                    sellPrice = aBestBid,
+                    profitPerUnit = aBestBid - bBestAsk,
+                    profitQty = 1.0
+                )
+            }else null
         }
-
         if (bBestBid != null && aBestAsk != null && bBestBid > aBestAsk){
+            if (bBestBid - aBestAsk > bBestBid / 10){
             return Arbitrage(
                 buyExchange = exchangeA.name,
                 sellExchange = exchangeB.name,
                 buyPrice = aBestAsk,
                 sellPrice = bBestBid,
-                profitPerUnit = bBestBid - aBestAsk
+                profitPerUnit = bBestBid - aBestAsk,
+                profitQty = 1.0
             )
+        }else null
         }
         return null
     }
@@ -48,6 +54,73 @@ class ArbitrageDetector(private val exchangeA: ExchangeBook, private val exchang
                 exchangeA.removeBestBid()
             }
         }
+//        val validResults = results.filter {it.profitQty > 0}
+//        val listsOfResults = results.partition {it.profitQty > 0}
         return results
+    }
+    fun findBestBid(exchanges: List<ExchangeBook>): Double? {
+        var bestBid: Double? = null
+        for (exchange in exchanges) {
+            val exchangeBestBid = exchange.bestBid()
+            if (exchangeBestBid != null) {
+                if (bestBid == null || exchangeBestBid > bestBid) {
+                    bestBid = exchangeBestBid
+                }
+            }
+        }
+        return bestBid
+
+    }
+    fun findBestAsk(exchanges: List<ExchangeBook>): Double? {
+        var bestAsk: Double? = null
+        for (exchange in exchanges) {
+            val exchangeBestAsk = exchange.bestAsk()
+            if (exchangeBestAsk != null) {
+                if (bestAsk == null || exchangeBestAsk < bestAsk) {
+                    bestAsk = exchangeBestAsk
+                }
+            }
+        }
+        return bestAsk
+
+    }
+
+    fun findOpportunityV2(): Arbitrage? {
+        val aBestBid = exchangeA.bestBidOrder()
+        val bBestBid = exchangeB.bestBidOrder()
+        val bBestAsk = exchangeB.bestAskOrder()
+        val aBestAsk = exchangeB.bestAskOrder()
+
+        if (aBestBid != null && bBestAsk != null && aBestBid.price > bBestAsk.price){
+            if (bBestAsk.quantity >= aBestBid.quantity) {
+                return Arbitrage(
+                    buyExchange = exchangeA.name,
+                    sellExchange = exchangeB.name,
+                    buyPrice = bBestAsk.price,
+                    sellPrice = aBestBid.price,
+                    profitPerUnit = aBestBid.price - bBestAsk.price,
+                    profitQty = bBestAsk.quantity - aBestBid.quantity
+                )
+            }else{
+                println("found opportunity but not enough for big profit")
+                return null
+            }
+        }
+        if (bBestBid != null && aBestAsk != null && bBestBid.price > aBestAsk.price) {
+            if (aBestAsk.quantity >= bBestBid.quantity) {
+                return Arbitrage(
+                    buyExchange = exchangeA.name,
+                    sellExchange = exchangeB.name,
+                    buyPrice = aBestAsk.price,
+                    sellPrice = bBestBid.price,
+                    profitPerUnit = bBestBid.price - aBestAsk.price,
+                    profitQty = aBestAsk.quantity - bBestBid.quantity
+                )
+            }else{
+                println("found opportunity but not enough for big profit")
+                return null
+            }
+        }
+        return null
     }
 }

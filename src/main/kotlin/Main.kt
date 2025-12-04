@@ -1,30 +1,38 @@
 package org.kevin
 
 import org.kevin.enums.OrderType
-import org.kevin.models.Order
+import org.kevin.data.Order
 import org.kevin.services.ArbitrageDetector
 import org.kevin.services.ExchangeBook
+import org.kevin.services.OrderGenerator
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 fun main() {
+
     val exA  = ExchangeBook("A")
     val exB = ExchangeBook("B")
     val detector = ArbitrageDetector(exA, exB)
 
-    exA.addOrder(Order("1", OrderType.SELL,13.0,1.0))
-    exA.addOrder(Order("2", OrderType.BUY,29.0,1.0))
+    val generator = OrderGenerator()
 
-    exB.addOrder(Order("3", OrderType.BUY,24.0,1.0))
-    exB.addOrder(Order("4", OrderType.SELL,12.0,1.0))
+    val manyOrders = generator.randomOrders(10)
 
-    println(exA.bestBid())
-    println(exB.bestBid())
-    println(exA.bestAsk())
-    println(exB.bestAsk())
+    manyOrders.forEach { order ->
+        exA.addOrder(order)
+    }
+    val manyOrdersB = generator.randomOrders(10)
+
+    manyOrdersB.forEach { order ->
+        exB.addOrder(order)
+    }
+
+    println(exA)
+    println(exB)
 
     val deals = detector.findAll()
 
-    println(deals)
+    deals.forEach {println(it)}
+
 
 }

@@ -6,5 +6,5 @@ data class Order(
     val id: String,
     val type: OrderType,
     val price: Double,
-    val quantity: Double
+    var quantity: Double
 )

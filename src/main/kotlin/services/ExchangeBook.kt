@@ -36,7 +36,7 @@ class ExchangeBook(val name: String) {
         val bestBid = buyOrders.firstKey() ?: return null
         val orders = buyOrders[bestBid]!!
 
-        var removedOrder = orders.removeFirst()
+        val removedOrder = orders.removeFirst()
 
         if (orders.isEmpty()){
             buyOrders.remove(bestBid)
@@ -44,13 +44,59 @@ class ExchangeBook(val name: String) {
         ordersById.remove(removedOrder.id)
         return removedOrder
     }
+    @Synchronized
+    fun removeBestBidV2(qty: Double): Double? {
+        val bestBuy = buyOrders.firstKey() ?: return null
+        val orders = buyOrders[bestBuy]!!
+        val order = orders.first()
+        var remainedQty = qty
+
+        if (remainedQty >= order.quantity) {
+            remainedQty -= order.quantity
+            orders.removeFirst()
+            ordersById.remove(order.id)
+
+            if (orders.isEmpty()) {
+                buyOrders.remove(bestBuy)
+            }
+
+            return remainedQty
+        } else {
+
+            order.quantity -= remainedQty
+            return 0.0
+        }
+    }
+    @Synchronized
+    fun removeBestSellV2(qty: Double): Double? {
+        val bestSell = sellOrders.firstKey() ?: return null
+        val orders = sellOrders[bestSell]!!
+        val order = orders.first()
+        var remainedQty = qty
+
+        if (remainedQty >= order.quantity) {
+            remainedQty -= order.quantity
+            orders.removeFirst()
+            ordersById.remove(order.id)
+
+            if (orders.isEmpty()) {
+                sellOrders.remove(bestSell)
+            }
+
+            return remainedQty
+        } else {
+            order.quantity -= remainedQty
+            return 0.0
+        }
+    }
+
 
     @Synchronized
     fun removeBestSell(): Order?{
         val bestSell = sellOrders.firstKey() ?: return null
         val orders = sellOrders[bestSell]!!
 
-        var removedOrder = orders.removeFirst()
+        val removedOrder = orders.removeFirst()
 
         if (orders.isEmpty()){
             sellOrders.remove(bestSell)
@@ -111,8 +157,8 @@ class ExchangeBook(val name: String) {
 
     @Synchronized
     fun bestBidOrder(): Order?{
-        val bestEntry = buyOrders.firstEntry()
-        val bestOrder = bestEntry.value
+        val bestEntry = sellOrders.firstEntry() ?: return null
+        val bestOrder = bestEntry.value?:return null
         if (bestOrder.isEmpty()) return null
         return bestOrder.first()
     }
@@ -123,8 +169,8 @@ class ExchangeBook(val name: String) {
 
     @Synchronized
     fun bestAskOrder(): Order?{
-        val bestEntry = sellOrders.firstEntry()
-        val bestOrder = bestEntry.value
+        val bestEntry = sellOrders.firstEntry() ?: return null
+        val bestOrder = bestEntry.value?:return null
         if (bestOrder.isEmpty()) return null
         return bestOrder.first()
     }

@@ -10,7 +10,7 @@ class OrderGenerator {
         val id = Random.nextInt(1, 101).toString()
         val type = if (Random.nextBoolean()) OrderType.BUY else OrderType.SELL
         val price = Random.nextInt(10, 100).toDouble()
-        val quantity = 1.0
+        val quantity = Random.nextInt(1, 20).toDouble()
         return Order(id, type, price, quantity)
     }
 

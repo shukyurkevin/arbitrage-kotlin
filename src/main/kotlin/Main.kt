@@ -22,7 +22,7 @@ fun main() {
     println(exA)
     println(exB)
 
-    val deals = detector.findAll()
+    val deals = detector.findAllV2()
 
     deals.forEach {println(it)}
 }
